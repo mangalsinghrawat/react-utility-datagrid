@@ -34,7 +34,7 @@ const UtilityDataGrid = ({
   sortingOrder,
   sx,
   enableRowClick = false,
-  enableToolbar= true
+  enableToolbar = true,
 }) => {
   const [finalData, setFinalData] = useState(rows);
   const [currentPage, setCurrentPage] = useState(0);
@@ -46,6 +46,7 @@ const UtilityDataGrid = ({
   const [visibleColumns, setVisibleColumns] = useState(columnHeaders);
   const [manageColumnsOpen, setManageColumnsOpen] = useState(false);
   const filterRef = useRef(null);
+
   const operators = [
     "contains",
     "equals",
@@ -53,6 +54,7 @@ const UtilityDataGrid = ({
     "ends with",
     "is empty",
   ];
+
 
   useEffect(() => {
     setTotalPages(Math.ceil(rows.length / pageSize));
@@ -133,9 +135,120 @@ const UtilityDataGrid = ({
     );
   };
 
+  function getColumnTypes(columnHeader, row) {
+    return columnHeader.map(col => {
+      let type = typeof row[col];
+      if (type === 'object' && row[col] === null) {
+        type = 'string';
+      } else if (type === 'number' && Number.isInteger(row[col])) {
+        type = 'number';
+      } else if (type === 'string' && !isNaN(Date.parse(row[col]))) {
+        type = 'date';
+      }
+      return { name: col, type };
+    });
+  }
+  const columnsWithTypes = getColumnTypes(columnHeaders, rows[0]);
+
+
+
+  function applyFilter(data, filter) {
+    const { column, operator, value, columnType } = filter;
+    return data.filter(item => {
+      const itemValue = item[column];
+      switch (columnType) {
+        case 'string':
+          switch (operator) {
+            case 'contains':
+              return itemValue.toLowerCase().includes(value.toLowerCase());
+            case 'equals':
+              return itemValue.toLowerCase() === value.toLowerCase();
+            case 'starts with':
+              return itemValue.toLowerCase().startsWith(value.toLowerCase());
+            case 'ends with':
+              return itemValue.toLowerCase().endsWith(value.toLowerCase());
+            case 'is empty':
+              return itemValue === '';
+            default:
+              return false;
+          }
+        case 'number':
+          const numValue = parseFloat(value);
+          switch (operator) {
+            case '=':
+              return itemValue === numValue;
+            case '!=':
+              return itemValue !== numValue;
+            case '>':
+              return itemValue > numValue;
+            case '<':
+              return itemValue < numValue;
+            case '>=':
+              return itemValue >= numValue;
+            case '<=':
+              return itemValue <= numValue;
+            case 'is empty':
+              return itemValue === null || itemValue === undefined;
+            case 'is not empty':
+              return itemValue !== null && itemValue !== undefined;
+            default:
+              return false;
+          }
+        case 'boolean':
+          const boolValue = (value === 'true');
+          switch (operator) {
+            case 'is':
+              return itemValue === boolValue;
+            default:
+              return false;
+          }
+        case 'date':
+          const itemDate = new Date(itemValue);
+          const filterDate = new Date(value);
+          switch (operator) {
+            case 'is':
+              return itemDate.getTime() === filterDate.getTime();
+            case 'is not':
+              return itemDate.getTime() !== filterDate.getTime();
+            case 'is after':
+              return itemDate > filterDate;
+            case 'is before':
+              return itemDate < filterDate;
+            case 'is empty':
+              return !itemValue;
+            default:
+              return false;
+          }
+        default:
+          return false;
+      }
+    });
+  }
+
+  function filterData(data, filters) {
+    let filteredData = data;
+    for (let i = 0; i < filters.length; i++) {
+      const filter = filters[i];
+      if (filter.filterType === 'and' || !filter.filterType) {
+        filteredData = applyFilter(filteredData, filter);
+      } else if (filter.filterType === 'or') {
+        const tempData = applyFilter(data, filter);
+        filteredData = [...new Set([...filteredData, ...tempData])];
+      }
+    }
+    setFinalData(filteredData)
+    // return filteredData;
+  }
+
+
   return (
     <div className="">
-      <div className="bg-slate-300 h-11 p-2 "> <marquee>⚠️⚠️⚠️ This Toolbar is under construction...⚠️⚠️⚠️</marquee> </div>
+      <div className="bg-slate-300 h-11 p-2 ">
+        {" "}
+        <marquee>
+          ⚠️⚠️⚠️ This Toolbar is under construction...⚠️⚠️⚠️
+        </marquee>{" "}
+      </div>
       <div className="h-[400px] overflow-scroll">
         <table className="table-auto  w-full border-collapse border border-gray-300 ">
           <thead className="bg-gray-100 sticky top-0 z-10">
@@ -243,9 +356,10 @@ const UtilityDataGrid = ({
           open={enableFilterOptions}
           onClose={handlePopupClose}>
           <FilterComponent
-            column={[columnHeaders[filterColumnIndex]]}
-            columns={columnHeaders}
-            operators={operators}
+            selectedColumn={[columnHeaders[filterColumnIndex]]}
+            columns={columnsWithTypes}
+            rows={rows}
+            onApplyFilters = {filterData}
           />
         </PopupComponent>
       )}
