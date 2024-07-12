@@ -33,7 +33,7 @@ const UtilityDataGrid = ({
   rows,
   sortingOrder,
   sx,
-  enableRowClick = false,
+  enableRowClick = true,
   enableToolbar = true,
 }) => {
   const [finalData, setFinalData] = useState(rows);
@@ -45,29 +45,33 @@ const UtilityDataGrid = ({
   const [filterColumnIndex, setFilterColumnIndex] = useState(null);
   const [visibleColumns, setVisibleColumns] = useState(columnHeaders);
   const [manageColumnsOpen, setManageColumnsOpen] = useState(false);
+  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+  const [filteredData, setFilteredData] = useState(rows);
   const filterRef = useRef(null);
 
-  const operators = [
-    "contains",
-    "equals",
-    "starts with",
-    "ends with",
-    "is empty",
-  ];
+
+  //For initial level load
+  // useEffect(() => {
+  //   setTotalPages(Math.ceil(rows.length / pageSize));
+  //   setFinalData(
+  //     rows.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+  //   );
+  // }, [rows, currentPage, pageSize]);
+
+  // useEffect(() => {
+  //   setFinalData(
+  //     rows.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+  //   );
+  // }, [currentPage, pageSize, rows]);
 
 
   useEffect(() => {
-    setTotalPages(Math.ceil(rows.length / pageSize));
+    setTotalPages(Math.ceil(filteredData.length / pageSize));
     setFinalData(
-      rows.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+      filteredData.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
     );
-  }, [rows, currentPage, pageSize]);
+  }, [filteredData, currentPage, pageSize]);
 
-  useEffect(() => {
-    setFinalData(
-      rows.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-    );
-  }, [currentPage, pageSize, rows]);
 
   const handleNextPage = () => {
     if (currentPage < totalPages - 1) {
@@ -113,26 +117,31 @@ const UtilityDataGrid = ({
     setAnchorEl(null);
     setMenuIndex(null);
   };
-
+  
   const sortData = (key, direction) => {
-    const sortedData = [...rows].sort((a, b) => {
+    const sortedData = [...filteredData].sort((a, b) => {
       const aValue = a[key];
       const bValue = b[key];
 
       const isNumericA = !isNaN(aValue);
       const isNumericB = !isNaN(bValue);
+      const isDateA = !isNaN(Date.parse(aValue));
+      const isDateB = !isNaN(Date.parse(bValue));
 
       if (isNumericA && isNumericB) {
         return direction === "ASC" ? aValue - bValue : bValue - aValue;
+      } else if (isDateA && isDateB) {
+        const dateA = new Date(aValue);
+        const dateB = new Date(bValue);
+        return direction === "ASC" ? dateA - dateB : dateB - dateA;
       } else {
         const comparison = aValue.toString().localeCompare(bValue.toString());
         return direction === "ASC" ? comparison : -comparison;
       }
     });
 
-    setFinalData(
-      sortedData.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-    );
+    setFilteredData(sortedData);
+    setCurrentPage(0); // Reset to first page after sorting
   };
 
   function getColumnTypes(columnHeader, row) {
@@ -236,15 +245,27 @@ const UtilityDataGrid = ({
         filteredData = [...new Set([...filteredData, ...tempData])];
       }
     }
-    setFinalData(filteredData)
+   
+    setFilteredData(filteredData);
+    setCurrentPage(0); 
     // return filteredData;
   }
+  const handleRowClickWrapper = (item, index) => {
+    if (enableRowClick) {
+      if (selectedRowIndex === index) {
+        setSelectedRowIndex(null);
+        onRowClick(null);  // Pass null to indicate no selection
+      } else {
+        setSelectedRowIndex(index);
+        onRowClick(item);
+      }
+    }
+  };
 
 
   return (
     <div className="">
       <div className="bg-slate-300 h-11 p-2 ">
-        {" "}
         <marquee>
           ⚠️⚠️⚠️ This Toolbar is under construction...⚠️⚠️⚠️
         </marquee>{" "}
@@ -320,11 +341,15 @@ const UtilityDataGrid = ({
           </thead>
           <tbody>
             {finalData.map((item, index) => (
-              <tr key={index} className="hover:bg-gray-100">
+              <tr key={index} 
+              className={`hover:bg-gray-100 ${index === selectedRowIndex ? 'bg-blue-100 border border-blue-500 hover:bg-blue-100' : ''}`}
+              onClick={() => handleRowClickWrapper(item, index)}>
                 {visibleColumns.map((column, i) => (
                   <td
                     key={i}
-                    className="border border-gray-300 p-2 whitespace-nowrap">
+                    className="border border-gray-300 p-2 whitespace-nowrap"
+                    // className={`whitespace-nowrap p-2  ${index === selectedRowIndex ? 'border  border-y-blue-500 border-x-gray-300' : 'border border-gray-300'} `}
+                  >
                     {item[column]}
                   </td>
                 ))}
@@ -379,12 +404,13 @@ const UtilityDataGrid = ({
 UtilityDataGrid.propTypes = {
   columnHeaders: PropTypes.arrayOf(PropTypes.string),
   pageSize: PropTypes.number,
-  onRowClick: PropTypes.func,
+  onRowClick: PropTypes.func.isRequired,
   rowHeight: PropTypes.number,
-  rows: PropTypes.arrayOf(PropTypes.object),
+  rows: PropTypes.arrayOf(PropTypes.object).isRequired,
   sortingOrder: PropTypes.oneOf(["asc", "desc"]),
   sx: PropTypes.any,
   enableRowClick: PropTypes.bool,
+  enableToolbar: PropTypes.bool,
 };
 
 export default UtilityDataGrid;

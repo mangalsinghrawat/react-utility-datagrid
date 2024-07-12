@@ -71,6 +71,7 @@ const FilterComponent = ({
   rows
 }) => {
   const [filters, setFilters] = useState([{ column: "", operator: "", value: "", columnType: "" }]);
+  
 
   //for getting selected column type
   const getColumnType = (columnName) => {     
@@ -270,7 +271,7 @@ const FilterComponent = ({
               size="small"
               style={{ marginTop: "23px",minWidth:'160px' }}
               className="border p-1 rounded"
-              value={filter.value ? dayjs(filter.value).format('MM/DD/YYYY') : null}
+              value={filter.value }
               defaultValue={filter.value}
               onChange={(e) => handleChange(index, "value",dayjs(e.target.value).format("DD/MM/YYYY"))}
             />
