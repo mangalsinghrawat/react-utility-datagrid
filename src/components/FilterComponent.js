@@ -105,11 +105,18 @@ const FilterComponent = ({
     const columnType = getColumnType(value);
     const columnOperator = Operators[columnType];    
 
-    newFilters[index][field] = value;
+    // newFilters[index][field] = value;  
     if (field === "column") {
       newFilters[index]["columnType"] = columnType; //get column type 
       newFilters[index]["operator"] = columnOperator[0]; // Reset operator when column changes
     }
+
+    if (field === "value" && columnType === "date") {
+      newFilters[index][field] = value ? dayjs(value).format("DD/MM/YYYY") : "";
+    } else {
+      newFilters[index][field] = value;
+    }
+
     setFilters(newFilters);
   };
 
@@ -244,37 +251,30 @@ const FilterComponent = ({
               onChange={(e) => handleChange(index, "value", e.target.value)}
             />
           ) : (
-            // <LocalizationProvider dateAdapter={AdapterDayjs}>
-            //   <DatePicker
-            //       label="Value"
-            //        inputFormat="DD-MM-YYYY"
-            //     format="DD/MM/YYYY"
-            //     variant="standard"
-            //     size="small"
-            //     style={{ marginTop: "23px", minWidth: "160px" }}
-            //     className="border p-1 rounded"
-            //     value={filter.value ? dayjs(filter.value) : null}
-            //     onChange={(newValue) =>
-            //       handleChange(
-            //         index,
-            //         "value",
-            //         newValue ? newValue.format("DD/MM/YYYY") : ""
-            //       )
-            //     }
-
-            //   />
-            // </LocalizationProvider>
-                <TextField
-                  type="date"
-              placeholder="Filter Value"
-              variant="standard"
-              size="small"
-              style={{ marginTop: "23px",minWidth:'160px' }}
-              className="border p-1 rounded"
-              value={filter.value }
-              defaultValue={filter.value}
-              onChange={(e) => handleChange(index, "value",dayjs(e.target.value).format("DD/MM/YYYY"))}
-            />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+            label="Value"
+            inputFormat="DD/MM/YYYY"
+            sx={{ maxWidth: '200px', height: '40px'}}
+            value={filter.value ? dayjs(filter.value, "DD/MM/YYYY") : null}
+            onChange={(newValue) =>
+              handleChange(
+                index,
+                "value",
+                newValue ? newValue.format("DD/MM/YYYY") : ""
+              )
+            }
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="standard"
+                size="small"
+                style={{ marginTop: "6px", minWidth: "160px", height: '40px' }}
+                className="border p-1 rounded"
+              />
+            )}
+          />
+            </LocalizationProvider>
           )}
         </div>
       ))}
