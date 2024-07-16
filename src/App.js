@@ -3,6 +3,7 @@ import './App.css';
 import UtilityDataGrid from './components/UtilityDataGrid';
 import { MockData } from './utils/MockData';
 import TableChartRoundedIcon from '@mui/icons-material/TableChartRounded';
+import { useSelector } from 'react-redux';
 function App() {
   const [selectedRow, setSelectedRow] = useState({});
   const [showSelected, setShowSelected] = useState({
@@ -23,6 +24,9 @@ function App() {
       row: !showSelected.row
     })
   }
+
+  const filterData = useSelector(state => state.filter.filters);
+  console.log(filterData)
 
   const rowsPerPage = [10,25,50,100]
 

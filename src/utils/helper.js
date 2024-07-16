@@ -26,3 +26,32 @@ export function sortDescending(arr) {
     });
 }
   
+
+
+export const Operators= {
+  string: [
+    "contains",
+    "equals",
+    "starts with",
+    "ends with",
+    "is empty",
+  ],
+  number: [
+    "=",
+    "!=",
+    ">",
+    "<",
+    ">=",
+    "<=",
+    "is empty",
+    "is not empty",
+  ],
+  boolean: ["is"],
+  date: [
+    "is",
+    "is not",
+    "is after",
+    "is before",
+    "is empty",
+  ],
+};
