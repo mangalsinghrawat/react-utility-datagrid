@@ -24,12 +24,14 @@ function App() {
     })
   }
 
+  const rowsPerPage = [10,25,50,100]
+
   return (
     <div className="App" >
       <div className='flex bg-green-400 items-center justify-center p-2'>
       <TableChartRoundedIcon fontSize='small' /> &nbsp; <h1 className='font-mono font-bold ml-1 mr-1' >React Utility DataGrid </h1> &nbsp;<TableChartRoundedIcon fontSize='small' />
       </div>
-      <UtilityDataGrid onRowClick={handleRowClick} pageSize={10} columnHeaders={columnHeaders} rows={MockData} />
+      <UtilityDataGrid onRowClick={handleRowClick} pageSize={10} columnHeaders={columnHeaders} rows={MockData} rowsPerPage= {rowsPerPage} />
       <button className='p-2  bg-gray-300 border rounded disabled:opacity-50' onClick={handleToggle}>{ showSelected.row ? 'Hide' : 'Show' } Selected Row</button> 
       <div>
         

@@ -13,6 +13,7 @@ import {
   MenuItem,
   MenuList,
   Paper,
+  Select,
   TextField,
 } from "@mui/material";
 import { CiMenuKebab } from "react-icons/ci";
@@ -24,6 +25,8 @@ import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import PopupComponent from "./PopupComponent";
 import FilterComponent from "./FilterComponent";
 import ManageColumnComp from "./ManageColumnComp";
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 const UtilityDataGrid = ({
   pageSize = 10,
@@ -35,6 +38,7 @@ const UtilityDataGrid = ({
   sx,
   enableRowClick = true,
   enableToolbar = true,
+  rowsPerPage
 }) => {
   const [finalData, setFinalData] = useState(rows);
   const [currentPage, setCurrentPage] = useState(0);
@@ -47,6 +51,7 @@ const UtilityDataGrid = ({
   const [manageColumnsOpen, setManageColumnsOpen] = useState(false);
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
   const [filteredData, setFilteredData] = useState(rows);
+  const [selectedRowsPerPage, setSelectedRowsPerPage] = useState(pageSize)
   const filterRef = useRef(null);
 
 
@@ -66,11 +71,11 @@ const UtilityDataGrid = ({
 
 
   useEffect(() => {
-    setTotalPages(Math.ceil(filteredData.length / pageSize));
+    setTotalPages(Math.ceil(filteredData.length / selectedRowsPerPage));
     setFinalData(
-      filteredData.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+      filteredData.slice(currentPage * selectedRowsPerPage, (currentPage + 1) * selectedRowsPerPage)
     );
-  }, [filteredData, currentPage, pageSize]);
+  }, [filteredData, currentPage,selectedRowsPerPage]);
 
 
   const handleNextPage = () => {
@@ -88,6 +93,7 @@ const UtilityDataGrid = ({
   const handleClick = (event, index) => {
     setAnchorEl(event.currentTarget);
     setMenuIndex(index);
+
     setFilterColumnIndex(null);
   };
 
@@ -358,22 +364,42 @@ const UtilityDataGrid = ({
           </tbody>
         </table>
       </div>
-      <div className="flex justify-between items-center p-2">
-        <button
+      <div className="flex justify-end items-center p-2 border-2">
+        <div className="text-xs mr-5">
+          <span>Rows per page:</span>
+          <Select 
+            className="ml-2  h-4 "
+            variant="standard"
+            size="small"
+            value={selectedRowsPerPage}
+            onChange={(e) => {
+              setSelectedRowsPerPage(e.target.value);
+              setCurrentPage(0);
+            }}
+          >
+            {rowsPerPage.map((item, index) => {
+              return <MenuItem key={index} value={item}>{item}</MenuItem>
+            })}
+            </Select>
+        </div>
+      <span className="text-xs mr-4">
+          {/*{currentPage + 1} - {selectedRowsPerPage}  of {totalPages}*/}
+          {currentPage * selectedRowsPerPage + 1} - 
+          {Math.min((currentPage + 1) * selectedRowsPerPage, filteredData.length)} 
+          &nbsp; of &nbsp; {filteredData.length}
+    </span>
+        <IconButton
           className="p-2 border rounded disabled:opacity-50"
           onClick={handlePreviousPage}
           disabled={currentPage === 0}>
-          Previous
-        </button>
-        <span>
-          Page {currentPage + 1} of {totalPages}
-        </span>
-        <button
+          <KeyboardArrowLeftIcon fontSize="small" />
+        </IconButton>
+        <IconButton
           className="p-2 border rounded disabled:opacity-50"
           onClick={handleNextPage}
           disabled={currentPage >= totalPages - 1}>
-          Next
-        </button>
+          <KeyboardArrowRightIcon fontSize="small" />
+        </IconButton>
       </div>
       {filterColumnIndex !== null && (
         <PopupComponent
@@ -411,6 +437,7 @@ UtilityDataGrid.propTypes = {
   sx: PropTypes.any,
   enableRowClick: PropTypes.bool,
   enableToolbar: PropTypes.bool,
+  rowsPerPage : PropTypes.arrayOf(PropTypes.number)
 };
 
 export default UtilityDataGrid;
