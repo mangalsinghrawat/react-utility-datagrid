@@ -25,8 +25,18 @@ const ToolbarComponent = (props) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const filterRows = useSelector((state) => state.filter.filters);
-  console.log(filterRows);
+    const filterRows = useSelector((state) => state.filter.filters);
+    // const filterCount = filterRows.map(item => {
+    //     let i = 0;
+    //     if (item.value.length > 0 && item.value !== '') i++;
+    //     return i;
+    // } )
+    let filterCount = 0;
+    filterRows.forEach((item) => {
+        if (item.value.length > 0 && item.value !== '') filterCount++;
+    });
+    
+  console.log(filterCount);
 
     const handleMenuClick = (value) => {
         setDensity(value);
@@ -48,10 +58,11 @@ const ToolbarComponent = (props) => {
       <Button
         size="small"
         variant="text"
-        startIcon={
-          <Badge badgeContent={filterRows.length} color="primary">
+              startIcon={
+            filterCount > 0 ?
+          <Badge badgeContent={filterCount} color="primary">
             <FilterAltIcon />
-          </Badge>
+          </Badge> : <FilterAltIcon />
         }
         onClick={() => setEnableFilterOptions(!enableFilterOptions)}>
         Filters
