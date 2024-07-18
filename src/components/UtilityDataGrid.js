@@ -27,6 +27,7 @@ import FilterComponent from "./FilterComponent";
 import ManageColumnComp from "./ManageColumnComp";
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import ToolbarComponent from "./ToolbarComponent";
 
 const UtilityDataGrid = ({
   pageSize = 10,
@@ -52,6 +53,7 @@ const UtilityDataGrid = ({
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
   const [filteredData, setFilteredData] = useState(rows);
   const [selectedRowsPerPage, setSelectedRowsPerPage] = useState(pageSize)
+  const [density, setDensity] = useState('standard')
   const filterRef = useRef(null);
 
 
@@ -269,12 +271,26 @@ const UtilityDataGrid = ({
   };
 
 
+
   return (
     <div className="">
-      <div className="bg-slate-300 h-11 p-2 ">
-        <marquee>
-          ⚠️⚠️⚠️ This Toolbar is under construction...⚠️⚠️⚠️
-        </marquee>{" "}
+      <div className=" h-11 p-2 ">
+        <ToolbarComponent
+          // selectedColumn={[columnHeaders[filterColumnIndex]]}
+          // columns={columnsWithTypes}
+          // rows={rows}
+          // onApplyFilters={filterData}
+          // headers={columnHeaders}
+          // selectedHeaders={visibleColumns}
+          // setSelectedHeaders={setVisibleColumns}
+          
+          manageColumnsOpen={manageColumnsOpen}
+          setManageColumnsOpen={setManageColumnsOpen}
+          enableFilterOptions={enableFilterOptions}
+          setEnableFilterOptions={setEnableFilterOptions}
+          setDensity={setDensity}
+          exportData = {filteredData}
+        />
       </div>
       <div className="h-[400px] overflow-scroll">
         <table className="table-auto  w-full border-collapse border border-gray-300 ">
@@ -353,7 +369,7 @@ const UtilityDataGrid = ({
                 {visibleColumns.map((column, i) => (
                   <td
                     key={i}
-                    className="border border-gray-300 p-2 whitespace-nowrap"
+                    className={`border border-gray-300 ${density == 'compact' && 'p-1'} ${density == 'standard' && 'p-2'} ${density == 'comfortable' && 'p-4'}  whitespace-nowrap`}
                     // className={`whitespace-nowrap p-2  ${index === selectedRowIndex ? 'border  border-y-blue-500 border-x-gray-300' : 'border border-gray-300'} `}
                   >
                     {item[column]}

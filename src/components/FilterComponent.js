@@ -22,7 +22,7 @@ const FilterComponent = ({
   onApplyFilters,
   rows
 }) => {
-  const [filters, setFilters] = useState([{ column: "", operator: "", value: "", columnType: "" }]);
+  // const [filters, setFilters] = useState([{ column: "", operator: "", value: "", columnType: "" }]);
   
   const dispatch = useDispatch();
   const filterRows = useSelector(state => state.filter.filters);
@@ -117,7 +117,7 @@ const FilterComponent = ({
 
   // console.log(rows[selectedColumn]);
   console.log(rows);
-  console.log(filters);
+  // console.log(filters);
   console.log(columns);
   console.log(selectedColumn);
   return (
@@ -147,7 +147,7 @@ const FilterComponent = ({
             </>
           ) : (
             <span
-              className={filters[1]?.filterType ? "w-[145px]" : "w-0"}></span>
+              className={filterRows[1]?.filterType ? "w-[145px]" : "w-0"}></span>
           )}
           <FormControl>
             <InputLabel variant="standard">Column</InputLabel>

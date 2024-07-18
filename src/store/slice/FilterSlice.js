@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 
 
 const initialState = {
-    filters: [{ column: "", operator: "", value: "", columnType: "" }]
+    filters: []
 }
 
 
