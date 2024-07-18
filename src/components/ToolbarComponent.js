@@ -14,7 +14,8 @@ const ToolbarComponent = (props) => {
         enableFilterOptions,
         setEnableFilterOptions,
         setDensity,
-        exportData
+        exportData,
+        filterCount
   } = props;
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -25,18 +26,7 @@ const ToolbarComponent = (props) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-    const filterRows = useSelector((state) => state.filter.filters);
-    // const filterCount = filterRows.map(item => {
-    //     let i = 0;
-    //     if (item.value.length > 0 && item.value !== '') i++;
-    //     return i;
-    // } )
-    let filterCount = 0;
-    filterRows.forEach((item) => {
-        if (item.value.length > 0 && item.value !== '') filterCount++;
-    });
-    
-  console.log(filterCount);
+   
 
     const handleMenuClick = (value) => {
         setDensity(value);

@@ -28,6 +28,7 @@ import ManageColumnComp from "./ManageColumnComp";
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import ToolbarComponent from "./ToolbarComponent";
+import { useSelector } from "react-redux";
 
 const UtilityDataGrid = ({
   pageSize = 10,
@@ -56,6 +57,13 @@ const UtilityDataGrid = ({
   const [density, setDensity] = useState('standard')
   const filterRef = useRef(null);
 
+  const filterRows = useSelector((state) => state.filter.filters);
+
+  let filterCount = 0;
+  filterRows.forEach((item) => {
+      if (item.value.length > 0 && item.value !== '') filterCount++;
+  });
+  
 
   //For initial level load
   // useEffect(() => {
@@ -270,6 +278,11 @@ const UtilityDataGrid = ({
     }
   };
 
+  const handleRemoveFilter = () => {
+    setFilteredData(rows);
+  }
+
+
 
 
   return (
@@ -289,7 +302,8 @@ const UtilityDataGrid = ({
           enableFilterOptions={enableFilterOptions}
           setEnableFilterOptions={setEnableFilterOptions}
           setDensity={setDensity}
-          exportData = {filteredData}
+          exportData={filteredData}
+          filterCount = {filterCount}
         />
       </div>
       <div className="h-[400px] overflow-scroll">
@@ -426,7 +440,9 @@ const UtilityDataGrid = ({
             selectedColumn={[columnHeaders[filterColumnIndex]]}
             columns={columnsWithTypes}
             rows={rows}
-            onApplyFilters = {filterData}
+            onApplyFilters={filterData}
+            onRemoveFilters={handleRemoveFilter}
+            filterCount = {filterCount}
           />
         </PopupComponent>
       )}
