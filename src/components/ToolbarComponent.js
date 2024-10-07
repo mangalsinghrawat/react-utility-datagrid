@@ -15,7 +15,8 @@ const ToolbarComponent = (props) => {
         setEnableFilterOptions,
         setDensity,
         exportData,
-        filterCount
+        filterCount,
+        filterRef
   } = props;
 
   const [anchorEl, setAnchorEl] = React.useState(null);

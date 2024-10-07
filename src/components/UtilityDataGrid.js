@@ -303,7 +303,8 @@ const UtilityDataGrid = ({
           setEnableFilterOptions={setEnableFilterOptions}
           setDensity={setDensity}
           exportData={filteredData}
-          filterCount = {filterCount}
+          filterCount={filterCount}
+          filterRef= {filterRef}
         />
       </div>
       <div className="h-[400px] overflow-scroll">
